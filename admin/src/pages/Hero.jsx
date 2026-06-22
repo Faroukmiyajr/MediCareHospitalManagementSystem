@@ -10,9 +10,9 @@ const Hero = ({role = "admin", userName = "Doctor"}) => {
   return (
     <div className={heroStyles.container}>
       <Navbar/>
-      <main className={heroStyles.main}>
+      <main className={heroStyles.mainContainer}>
         <section className={heroStyles.section}>
-          <div className={heroStyles.decorativeBg.Container}>
+          <div className={heroStyles.decorativeBg.container}>
             <div className={heroStyles.decorativeBg.blurBackground}>
               <div className={heroStyles.decorativeBg.blurShape}></div>
             </div>
@@ -29,7 +29,7 @@ const Hero = ({role = "admin", userName = "Doctor"}) => {
                   : "Manage hospital operations, doctors, staff, patient records, and system settings from a centralized control panel."}
               </p>
               {/* info cards */}
-              <div className={heroStyles.infoCards.Container}>
+              <div className={heroStyles.infoCards.container}>
                 <div className={heroStyles.infoCards.card}>
                   <h3 className={heroStyles.infoCards.cardTitle}>Secure Access</h3>
                   <p className={heroStyles.infoCards.cardText}>

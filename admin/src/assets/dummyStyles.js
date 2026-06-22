@@ -512,9 +512,9 @@ export const navbarStyles = {
   centerNavItemInactive: "text-gray-700 hover:text-emerald-600",
   
   // Right section styles
-  rightContainer: "flex items-center gap-3",
-  signOutButton: "hidden lg:mx-1 lg:text-xs whitespace-nowrap xl:mx-1 lg:-mr-6 xl:mr-5 lg:flex px-4 py-2 cursor-pointer rounded-full bg-amber-500 text-white text-sm items-center gap-2 shadow-sm",
-  loginButton: "px-3 py-2 cursor-pointer rounded-full border bg-white text-emerald-600 text-sm shadow-sm",
+  rightContainer: "flex items-center gap-3 lg:mr-4",
+  signOutButton: "hidden lg:mx-1 lg:text-xs whitespace-nowrap xl:mx-1 lg:flex px-4 py-2 cursor-pointer rounded-full bg-amber-500 text-white text-sm items-center gap-2 shadow-sm",
+  loginButton: "px-6 py-2 cursor-pointer rounded-full border bg-white text-emerald-600 text-sm shadow-sm min-w-[150px] text-center",
   
   // Mobile menu button
   mobileMenuButton: "lg:hidden p-2 rounded-full bg-white shadow",
@@ -599,8 +599,8 @@ export const heroStyles = {
   
   // Info cards styles
   infoCards: {
-    container: "mx-auto max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-4",
-    card: "p-4 rounded-lg bg-emerald-50 border border-emerald-100 text-left",
+    container: "mx-auto w-full max-w-xl grid grid-cols-1 gap-4",
+    card: "w-full p-4 rounded-lg bg-emerald-50 border border-emerald-100 text-left",
     cardTitle: "font-semibold text-emerald-800",
     cardText: "text-sm text-gray-600 mt-1"
   }

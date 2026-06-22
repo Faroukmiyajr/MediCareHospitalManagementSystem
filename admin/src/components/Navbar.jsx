@@ -246,12 +246,14 @@ const Navbar = () => {
           {/* Placeholder for right-aligned items */}
           <div className={ns.rightContainer}>
             {isSignedIn ? (
-              <button
+              <div className='hidden lg:flex items-center gap-2'>
+                <button
                   onClick={handleSignOut}
-                  className={ns.signOutButton + ' ' + ns.cursorPointer}>
-                    S
-                  </button>
-            ): (
+                  className={ns.loginButton + ' ' + ns.cursorPointer}>
+                    Sign Out
+                </button>
+              </div>
+            ) : (
               <div className='hidden lg:flex items-center gap-2'>
                 <button
                   onClick={handleOpenSignIn}
@@ -331,10 +333,10 @@ const Navbar = () => {
                         handleSignOut();
                         setOpen(false);
                       }}
-                      className={ns.mobileAuthContainer}>
+                      className={ns.mobileSignOutButton + ' ' + ns.cursorPointer}>
                         Sign Out
                       </button>
-                    ): (
+                    ) : (
                       <div className='space -y-2'>
                         <button
                           onClick={() => {
