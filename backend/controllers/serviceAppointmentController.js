@@ -1,4 +1,4 @@
-import Service from '../models/Service.js';
+import Service from '../models/services.js';
 import ServiceAppointment from '../models/serviceAppointment.js';
 import Stripe from 'stripe';
 import { getAuth } from '@clerk/express';

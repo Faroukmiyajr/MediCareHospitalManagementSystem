@@ -3,21 +3,21 @@ import { Routes, Route, Link } from 'react-router-dom';
 import Hero from './pages/Hero';
 import {useUser} from '@clerk/clerk-react';
 import Home from './pages/Home';
+import Add from './pages/Add';
+import ListPage from './pages/List';
 
 function RequireAuth({ children }) {
   const { isLoaded, isSignedIn } = useUser();
 
-  if (!isLoaded) 
-    return null;
+  if (!isLoaded) return null;
   if (!isSignedIn) {
     return (
       <div className='min-h-screen font-mono flex items-center justify-center bg-gradient-to-b from-emerald-50 via-green-50 to-emerald-100 px-4'>
         <div className="text-center">
-         <p className='text-emerald-800 font-semibold text-lg sm:text-2xl mb-4 animate-fade-in'>Please sign in to view this content.</p>
-        <div className='flex justify-center'>
-          <Link to="/" className='bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow-md font-semibold py-2 px-4 rounded-full transition-all duration-300 ease-in-out animate-bounce-subtle'>Home</Link>
-
-        </div>
+          <p className='text-emerald-800 font-semibold text-lg sm:text-2xl mb-4 animate-fade-in'>Please sign in to view this content.</p>
+          <div className='flex justify-center'>
+            <Link to="/" className='bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm hover:shadow-md font-semibold py-2 px-4 rounded-full transition-all duration-300 ease-in-out animate-bounce-subtle'>Home</Link>
+          </div>
         </div>
       </div>
     );
@@ -28,10 +28,14 @@ function RequireAuth({ children }) {
 
 const App = () => {
   return (
-   <Routes>
-          <Route path = "/" element={<Hero/>}/>
-          <Route path = "/h" element={<RequireAuth><Home/></RequireAuth>}/>
-   </Routes>
+    <Routes>
+      <Route path='/' element={<Hero/>}/>
+      <Route path='/h' element={<RequireAuth><Home/></RequireAuth>}/>
+      <Route path='/dashboard' element={<RequireAuth><Home/></RequireAuth>}/>
+      <Route path='/add' element={<RequireAuth><Add/></RequireAuth>}/>
+      <Route path='/list' element={<RequireAuth><ListPage/></RequireAuth>}/>
+      <Route path='*' element={<Hero/>}/>
+    </Routes>
   );
 };
 

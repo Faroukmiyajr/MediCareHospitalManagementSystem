@@ -10,8 +10,8 @@ import {
   Search,
 } from 'lucide-react'
 
-// use relative API path so dev server proxy or production origin can handle it
-const PATIENT_COUNT_API = `/api/appointment/patients/count`
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const PATIENT_COUNT_API = `${API_BASE}/appointments/patients/count`;
 
 //helper functions
 const safeNumber = (v, fallback = 0) => {
@@ -44,31 +44,34 @@ function normalizeDoctor(doc) {
     `https://i.pravatar.cc/150?u=${id}`;
 
   const appointments = {
-    total:
+    total: safeNumber(
       doc.appointments?.total ??
-      doc.totalAppointments ??
-      doc.appointmentsTotal ??
-      0,
-    completed:
+        doc.totalAppointments ??
+        doc.appointmentsTotal ??
+        doc.appointments?.length ??
+        0,
+      0
+    ),
+    completed: safeNumber(
       doc.appointments?.completed ??
-      doc.completedAppointments ??
-      doc.appointmentsCompleted ??
-      0,
-    canceled:
+        doc.completedAppointments ??
+        doc.appointmentsCompleted ??
+        0,
+      0
+    ),
+    canceled: safeNumber(
       doc.appointments?.canceled ??
-      doc.canceledAppointments ??
-      doc.appointmentsCanceled ??
-      0,
+        doc.canceledAppointments ??
+        doc.appointmentsCanceled ??
+        0,
+      0
+    ),
   };
 
-  let earnings = null;
-  if (doc.earnings !== undefined && doc.earnings !== null)
-    earnings = safeNumber(doc.earnings, 0);
-  else if (doc.revenue !== undefined && doc.revenue !== null)
-    earnings = safeNumber(doc.revenue, 0);
-  else if (appointments.completed && fee)
-    earnings = fee * safeNumber(appointments.completed, 0);
-  else earnings = 0;
+  const earnings = safeNumber(
+    doc.earnings ?? doc.revenue ?? (appointments.completed && fee ? fee * appointments.completed : 0),
+    0
+  );
 
   return {
     id,
@@ -87,38 +90,60 @@ const DashboardPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // new patient count 
     const [patientCount, setPatientCount] = useState(null);
     const [loadingPatientCount, setLoadingPatientCount] = useState(false);
     const [query, setQuery] = useState('');
     const [showAll, setShowAll] = useState(false);
 
-    // oad doctors from server side
     useEffect(() => {
     let mounted = true;
+
+    async function loadDoctors() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${API_BASE}/doctors`);
+        if (!res.ok) throw new Error(`Doctors request failed (${res.status})`);
+
+        const body = await res.json().catch(() => ({}));
+        const items = Array.isArray(body?.data || body?.doctors || body) ? body.data || body.doctors || body : [];
+        const normalized = items.map(normalizeDoctor);
+        if (mounted) setDoctors(normalized);
+      } catch (err) {
+        console.error('Failed to load doctors:', err);
+        if (mounted) {
+          setDoctors([]);
+          setError(err.message || 'Unable to load doctors');
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
     async function loadPatientCount() {
       setLoadingPatientCount(true);
       try {
         const res = await fetch(PATIENT_COUNT_API);
         if (!res.ok) {
-          console.warn("Patient count fetch failed:", res.status);
+          console.warn('Patient count fetch failed:', res.status);
           if (mounted) setPatientCount(0);
           return;
         }
 
         const body = await res.json().catch(() => ({}));
-        const count = Number(
-          body?.count ?? body?.totalUsers ?? body?.data ?? 0
-        );
-        if (mounted) setPatientCount(isNaN(count) ? 0 : count);
+        const count = Number(body?.count ?? body?.totalUsers ?? body?.data ?? 0);
+        if (mounted) setPatientCount(Number.isNaN(count) ? 0 : count);
       } catch (err) {
-        console.error("Failed to fetch patient count:", err);
+        console.error('Failed to fetch patient count:', err);
         if (mounted) setPatientCount(0);
       } finally {
         if (mounted) setLoadingPatientCount(false);
       }
     }
+
+    loadDoctors();
     loadPatientCount();
+
     return () => {
       mounted = false;
     };
@@ -292,7 +317,7 @@ const DashboardPage = () => {
                     </td>
 
                     <td className={s.tableCell + " " + s.feeText}>
-                      ₹ {d.fee}
+                      ${d.fee}
                     </td>
 
                     <td className={s.tableCell + " " + s.appointmentsText}>
@@ -308,7 +333,7 @@ const DashboardPage = () => {
                     </td>
 
                     <td className={s.tableCell + " " + s.earningsText}>
-                      ₹ {d.earnings.toLocaleString()}
+                      $ {d.earnings.toLocaleString()}
                     </td>
                   </tr>
                 ))}

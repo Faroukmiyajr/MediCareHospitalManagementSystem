@@ -599,8 +599,8 @@ export const heroStyles = {
   
   // Info cards styles
   infoCards: {
-    container: "mx-auto w-full max-w-xl grid grid-cols-1 gap-4",
-    card: "w-full p-4 rounded-lg bg-emerald-50 border border-emerald-100 text-left",
+    container: "mx-auto w-full max-w-xl grid grid-cols-1 gap-4 ",
+    card: "w-full  p-4 rounded-lg bg-emerald-50 border border-emerald-100 text-left",
     cardTitle: "font-semibold text-emerald-800",
     cardText: "text-sm text-gray-600 mt-1"
   }

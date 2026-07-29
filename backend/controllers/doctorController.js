@@ -60,31 +60,37 @@ export const createDoctor = async (req, res) => {
   try {
     const body = req.body || {};
     if (!body.name || !body.email || !body.password) {
-        return res.status(400).json({ 
-            message: "Name, email, and password are required", success: false })
+      return res.status(400).json({
+        message: "Name, email, and password are required",
+        success: false,
+      });
+    }
 
+    const emailLC = (body.email || "").toLowerCase();
+    if (await Doctor.findOne({ email: emailLC })) {
+      return res.status(409).json({
+        message: "A doctor with this email already exists",
+        success: false,
+      });
+    }
 
+    let imageUrl = body.imageUrl || null;
+    let imagePublicId = body.imagePublicId || null;
 
+    if (req.file?.path) {
+      try {
+        const uploaded = await uploadToCloudinary(req.file.path, "doctors");
+        imageUrl = uploaded?.secure_url || uploaded?.url || imageUrl;
+        imagePublicId = uploaded?.public_id || uploaded?.publicId || imagePublicId;
+      } catch (uploadError) {
+        console.warn("Cloudinary upload failed, continuing without image:", uploadError?.message || uploadError);
+        imageUrl = null;
+        imagePublicId = null;
+      }
+    }
 
-        }
-
-        const emailLC = (body.email|| "").toLowerCase();
-        if (await Doctor.findOne({ email: emailLC })) {
-            return res.status(409).json({ 
-                message: "A doctor with this email already exists", success: false });
-        }
-
-
-        let imageUrl = body.imageUrl || null;
-        let imagePublicId = body.imagePublicId || null;
-        if (req.file?.path)
-{
-    const uploaded = await uploadToCloudinary(req.file.path, 'doctors')
-    imageUrl = uploaded?.secure_url || uploaded?.url||imageUrl;
-    imagePublicId = uploaded?.public_id||uploaded?.publicId|| imagePublicId;
-}  
-const schedule = parseScheduleInput(body.schedule);
-const doc = new Doctor({
+    const schedule = parseScheduleInput(body.schedule);
+    const doc = new Doctor({
       email: emailLC,
       password: body.password,
       name: body.name,
@@ -102,34 +108,39 @@ const doc = new Doctor({
       patients: body.patients || "",
       rating: body.rating !== undefined ? Number(body.rating) : 0,
     });
-    
-await doc.save();
-const secret = process.env.JWT_SECRET;
-if (!secret) {
-  console.warn('JWT_SECRET is not defined in environment variables');
-  return res.status(500).json({ message: "Server configuration error", success: false });
 
-}
+    await doc.save();
 
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.warn("JWT_SECRET is not defined in environment variables");
+      return res.status(500).json({ message: "Server configuration error", success: false });
+    }
 
-const token = jwt.sign({
-   id: doc._id.toString(),email: doc.email,
-   role:'doctor'
- }, secret, { expiresIn: '7d' });
+    const token = jwt.sign(
+      { id: doc._id.toString(), email: doc.email, role: "doctor" },
+      secret,
+      { expiresIn: "7d" }
+    );
 
- const out = normalizeDocForClient(doc.toObject());
- delete out.password;
+    const out = normalizeDocForClient(doc.toObject());
+    delete out.password;
 
- return res.status(201).json({ 
-  message: "Doctor created successfully",
-   success: true, doctor: out, token });
- }
-
-
-catch (error) {
-  console.error("Error creating doctor:", error);
-}
-}
+    return res.status(201).json({
+      message: "Doctor created successfully",
+      success: true,
+      doctor: out,
+      token,
+    });
+  } catch (error) {
+    console.error("Error creating doctor:", error);
+    return res.status(500).json({
+      message: "Failed to create doctor",
+      success: false,
+      error: error?.message || "Unknown error",
+    });
+  }
+};
 // to get doctor
 export const getDoctors = async (req, res) => {
   try {

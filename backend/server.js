@@ -1,12 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+
+console.log("Mongo URI exists:", !!process.env.MONGODB_URI);
+
 import { clerkMiddleware } from '@clerk/express';
 import { connectDB } from './config/db.js';
 import doctorRouter from './routes/doctorRouter.js';
 import serviceRouter from './routes/serviceRouter.js';
 import appointmentsRouter from './routes/appointmentsRouter.js';
 import serviceAppointmentRouter from './routes/serviceAppointmentRouter.js';
+
 
 
 const app = express();
@@ -31,7 +35,6 @@ app.use(cors({
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(cors(corsOptions));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(clerkMiddleware());
